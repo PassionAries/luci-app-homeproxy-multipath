@@ -23,9 +23,15 @@ PKG_NAME="$(get_mk_value "PKG_NAME")"
 if [ -n "$PKG_VERSION_OVERRIDE" ]; then
 	PKG_VERSION="$PKG_VERSION_OVERRIDE"
 elif [ "$RELEASE_TYPE" == "release" ]; then
-	PKG_VERSION="$(get_mk_value "PKG_VERSION")"
+	# The Makefile carries no version: a release is named by the date of the
+	# tagged commit and its hash, as the published packages are.
+	PKG_VERSION="$(git log -1 --format=%cd --date=format:%Y%m%d)~$(git rev-parse --short HEAD)"
 else
 	PKG_VERSION="$PKG_SOURCE_DATE_EPOCH~$(git rev-parse --short HEAD)"
+fi
+if ! [[ "$PKG_VERSION" =~ ^[0-9][0-9A-Za-z.~_+-]*$ ]]; then
+	echo "Invalid package version: '$PKG_VERSION'" >&2
+	exit 1
 fi
 
 TEMP_DIR="$(mktemp -d -p $BASE_DIR)"

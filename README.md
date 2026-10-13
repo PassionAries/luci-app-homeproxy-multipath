@@ -7,9 +7,14 @@ It is designed to work with [singbox-multipath](https://github.com/WuSiYu/singbo
 ![Multipath status dashboard](screenshot.png)
 
 This branch targets **sing-box v1.14.1-multipath-beta10**, multipath wire protocol
-v13 and status schema 5. Upgrade both multipath endpoints and this LuCI package
+v14 and status schema 5. Upgrade both multipath endpoints and this LuCI package
 together; an endpoint with a different protocol version is rejected with an
 explicit reason, and an older status schema is shown as an upgrade notice.
+
+The package depends on the `sing-box` package, but the sing-box in the OpenWrt
+feeds has no Multipath. Replace `/usr/bin/sing-box` with the singbox-multipath
+binary for your architecture from its releases; the Multipath status page warns
+when the installed sing-box lacks Multipath.
 
 ## Client node
 

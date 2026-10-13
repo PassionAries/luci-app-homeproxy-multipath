@@ -58,7 +58,7 @@ if (process.argv[3]) {
 }
 render();
 const rendered = JSON.stringify(page.root);
-for (const text of ['Connection send history', 'In flight / limit', 'Writer queue', 'Feedback frames', 'Repairs', 'Opportunistic / tail reinjection', 'Local memory regions', 'Fair shares', 'Unsent data: ceiling · live', 'Send history: ceiling · live', 'Receive window: ceiling · live', '1. leg0 is the bottleneck', 'leg1 · Secondary', '16 KiB pages', 'Remote scheduler estimate', 'Upload modes', 'Download modes', 'Upload policy', 'Download policy', 'Activation: 1 OR 2 OR 3', 'Feedback RTT', 'Probe RTT (active flows)', 'Probe health (active flows)']) assert.ok(rendered.includes(text), text);
+for (const text of ['Connection send history', 'In flight / limit', 'Writer queue', 'Feedback frames', 'Repairs', 'Opportunistic / tail reinjection', 'Local memory regions', 'Fair shares', 'Unsent data: ceiling · live', 'Send history: ceiling · live', 'Receive window: ceiling · fair share', '1. leg0 is the bottleneck', 'leg1 · Secondary', '16 KiB pages', 'Remote scheduler estimate', 'Upload modes', 'Download modes', 'Upload policy', 'Download policy', 'Activation: 1 OR 2 OR 3', 'Feedback RTT', 'Probe RTT (active flows)', 'Probe health (active flows)']) assert.ok(rendered.includes(text), text);
 assert.ok(!rendered.includes('Automatic delivery-based scheduling'));
 assert.ok(!rendered.includes('Local TX policy'));
 assert.ok(!rendered.includes('Queue utilization:'));
@@ -132,7 +132,7 @@ for (const message of ['i/o timeout', 'multipath hello rejected: invalid leg id'
   render();
   assert.ok(flatten(page.root).includes(message));
 }
-for (const [message, hint] of [['multipath hello rejected: authentication failed (check psk on both endpoints)', 'pre-shared key'], ['multipath hello rejected: unsupported protocol version (both endpoints must use v13)', 'beta10']]) {
+for (const [message, hint] of [['multipath hello rejected: authentication failed (check psk on both endpoints)', 'pre-shared key'], ['multipath hello rejected: unsupported protocol version (both endpoints must use v14)', 'beta10']]) {
   Object.assign(leg, { last_error: message, last_error_source: 'unknown', last_error_harmless: false, error_count: number(leg.error_count) + 1 });
   render();
   assert.ok(flatten(page.root).includes(hint), hint);
@@ -201,3 +201,12 @@ render({ ...document, schema_version: 2 }, { incompatible_schemas: [2] });
 assert.ok(JSON.stringify(page.root).includes('No multipath status data is available.'));
 assert.ok(flatten(page.root).includes('Unsupported status schema: 2'));
 console.log('PASS: schema 5 directions/live limits/counters/tooltips, rejection hints, unavailable/stale/historical states, folding, event dismissal, segment wrapping, 1s poll, old-schema notice');
+
+// A sing-box without Multipath is pointed out; the fork's build is not.
+const notices = () => findNodes(page.root, node => node.attrs?.class === 'mp-notice').map(flatten).join('\n');
+page.render([{ nodes: [document] }, { version: '1.14.1' }]);
+assert.ok(notices().includes('has no Multipath support'), notices());
+page.render([{ nodes: [document] }, { version: '1.14.1-multipath-beta10' }]);
+assert.ok(!notices().includes('has no Multipath support'), notices());
+page.render([{ nodes: [document] }, {}]);
+assert.ok(!notices().includes('has no Multipath support'), notices());

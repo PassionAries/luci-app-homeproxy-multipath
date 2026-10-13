@@ -1937,6 +1937,14 @@ msgstr "多路径出站"
 msgid "Multipath status data is stale."
 msgstr "多路径状态数据已过期。"
 
+#: htdocs/luci-static/resources/view/homeproxy/multipath.js
+msgid "The installed sing-box (%s) has no Multipath support. Multipath nodes need the singbox-multipath build of sing-box on this device; the sing-box package from the OpenWrt feeds cannot run them."
+msgstr "已安装的 sing-box（%s）不支持 Multipath。Multipath 节点需要在本设备安装 singbox-multipath 版本的 sing-box，OpenWrt 软件源中的 sing-box 无法运行。"
+
+#: htdocs/luci-static/resources/view/homeproxy/multipath.js
+msgid "unknown version"
+msgstr "未知版本"
+
 #: htdocs/luci-static/resources/view/homeproxy/node.js:1100
 #: htdocs/luci-static/resources/view/homeproxy/server.js:500
 msgid "Multiplex"
@@ -4434,8 +4442,8 @@ msgid "Multipath beta10"
 msgstr "Multipath beta10"
 
 #: htdocs/luci-static/resources/view/homeproxy/node.js
-msgid "Requires beta10 (protocol v13) on both endpoints. Defaults are the recommended values: leave the activation and buffer fields empty unless you need a specific behavior. Buffer fields are ceilings, not capacities."
-msgstr "两端须为 beta10（协议 v13）。默认值即推荐值：除非需要特定行为，激活和缓冲字段请留空。缓冲字段是上限，不是容量。"
+msgid "Requires beta10 (protocol v14) on both endpoints. Defaults are the recommended values: leave the activation and buffer fields empty unless you need a specific behavior. Buffer fields are ceilings, not capacities."
+msgstr "两端须为 beta10（协议 v14）。默认值即推荐值：除非需要特定行为，激活和缓冲字段请留空。缓冲字段是上限，不是容量。"
 
 #: htdocs/luci-static/resources/view/homeproxy/node.js
 msgid "Ignored legacy settings"
@@ -4510,8 +4518,8 @@ msgid "Advanced ceiling: receive window"
 msgstr "高级上限：接收窗口"
 
 #: htdocs/luci-static/resources/view/homeproxy/node.js
-msgid "Upper bound of the window at this direction's receiver: server for upload, client for download. The working value is the session's fair share of the receiver's memory. Empty is 512 MiB."
-msgstr "本方向接收端窗口的上限：上传为服务端，下载为客户端。实际值为该会话在接收端内存中的公平份额。留空为 512 MiB。"
+msgid "Upper bound of the window at this direction's receiver: server for upload, client for download. The working window follows each connection's use, up to the fair share of the receiver's memory. Empty is 512 MiB."
+msgstr "本方向接收端窗口的上限：上传为服务端，下载为客户端。实际窗口随各连接的用量变化，最多到接收端内存的公平份额。留空为 512 MiB。"
 
 #: htdocs/luci-static/resources/view/homeproxy/node.js
 msgid "Path stall timeout floor"
@@ -4714,16 +4722,16 @@ msgid "Bytes retained at the sender until cumulative Data ACK, both paths and un
 msgstr "发送端在累计 Data ACK 前保留的字节，含两条路径和未发送数据。实时上限约为两倍带宽时延积，受发送端公平内存份额约束，取开放连接中的最大值。"
 
 #: htdocs/luci-static/resources/view/homeproxy/multipath.js
-msgid "Receive window: ceiling · live"
-msgstr "接收窗口：上限 · 实时"
+msgid "Receive window: ceiling · fair share"
+msgstr "接收窗口：上限 · 公平份额"
 
 #: htdocs/luci-static/resources/view/homeproxy/multipath.js
 msgid "server share"
 msgstr "服务端份额"
 
 #: htdocs/luci-static/resources/view/homeproxy/multipath.js
-msgid "Window at the receiver: server for upload, client for download. The live window is each active session's fair share of the receiver's memory."
-msgstr "接收端的窗口：上传为服务端，下载为客户端。实时窗口为每个活跃会话在接收端内存中的公平份额。"
+msgid "Window at the receiver: server for upload, client for download. The fair share is the level at which the receiver's memory is divided by demand (max-min): a connection whose window limits its sender may grow up to it, while the others keep what they use. It is not the window of any one connection."
+msgstr "接收端的窗口：上传为服务端，下载为客户端。公平份额是接收端内存按需求公平分配（max-min）的水位：受窗口限制的连接最多增长到这里，其他连接只保留实际用量；它不是某一条连接的实际窗口。"
 
 #: htdocs/luci-static/resources/view/homeproxy/multipath.js
 msgid "Optional lower bound on adaptive sender no-progress detection. Applies to either path, not a fixed retransmission or disconnect timer."

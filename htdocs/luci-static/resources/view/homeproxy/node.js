@@ -638,7 +638,7 @@ function renderNodeSettings(section, data, features, main_node, routing_mode) {
 	o.modalonly = true;
 
 	o = s.option(form.DummyValue, '_multipath_beta10_migration', _('Multipath beta10'));
-	o.default = _('Requires beta10 (protocol v13) on both endpoints. Defaults are the recommended values: leave the activation and buffer fields empty unless you need a specific behavior. Buffer fields are ceilings, not capacities.');
+	o.default = _('Requires beta10 (protocol v14) on both endpoints. Defaults are the recommended values: leave the activation and buffer fields empty unless you need a specific behavior. Buffer fields are ceilings, not capacities.');
 	o.depends('type', 'multipath');
 	o.modalonly = true;
 	o = s.option(form.DummyValue, '_multipath_legacy_fields', _('Ignored legacy settings'));
@@ -704,7 +704,7 @@ function renderNodeSettings(section, data, features, main_node, routing_mode) {
 			_('Upper bound of bytes retained at this direction\'s sender until Data ACK, both legs and unsent data included. The working value is about twice the bandwidth-delay product within the host\'s fair share. Empty is 512 MiB.'), false);
 		o.validate = validateMemorySize;
 		o = field(form.Value, 'receive_window_bytes', _('Advanced ceiling: receive window'),
-			_('Upper bound of the window at this direction\'s receiver: server for upload, client for download. The working value is the session\'s fair share of the receiver\'s memory. Empty is 512 MiB.'), false);
+			_('Upper bound of the window at this direction\'s receiver: server for upload, client for download. The working window follows each connection\'s use, up to the fair share of the receiver\'s memory. Empty is 512 MiB.'), false);
 		o.validate = validateMemorySize;
 		o = field(form.Value, 'path_stall_timeout_min', _('Path stall timeout floor'),
 			_('Duration such as 500ms or 2s; empty keeps adaptive timing. Range 100ms to 5m. This is a lower bound on no-progress detection, not a fixed retransmission interval or a disconnect timer.'), false);

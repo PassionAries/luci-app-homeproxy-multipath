@@ -1899,6 +1899,14 @@ msgstr ""
 msgid "Multipath status data is stale."
 msgstr ""
 
+#: htdocs/luci-static/resources/view/homeproxy/multipath.js
+msgid "The installed sing-box (%s) has no Multipath support. Multipath nodes need the singbox-multipath build of sing-box on this device; the sing-box package from the OpenWrt feeds cannot run them."
+msgstr ""
+
+#: htdocs/luci-static/resources/view/homeproxy/multipath.js
+msgid "unknown version"
+msgstr ""
+
 #: htdocs/luci-static/resources/view/homeproxy/node.js:1100
 #: htdocs/luci-static/resources/view/homeproxy/server.js:500
 msgid "Multiplex"
@@ -3921,7 +3929,7 @@ msgid "Multipath beta10"
 msgstr ""
 
 #: htdocs/luci-static/resources/view/homeproxy/node.js
-msgid "Requires beta10 (protocol v13) on both endpoints. Defaults are the recommended values: leave the activation and buffer fields empty unless you need a specific behavior. Buffer fields are ceilings, not capacities."
+msgid "Requires beta10 (protocol v14) on both endpoints. Defaults are the recommended values: leave the activation and buffer fields empty unless you need a specific behavior. Buffer fields are ceilings, not capacities."
 msgstr ""
 
 #: htdocs/luci-static/resources/view/homeproxy/node.js
@@ -4009,7 +4017,7 @@ msgid "Advanced ceiling: receive window"
 msgstr ""
 
 #: htdocs/luci-static/resources/view/homeproxy/node.js
-msgid "Upper bound of the window at this direction's receiver: server for upload, client for download. The working value is the session's fair share of the receiver's memory. Empty is 512 MiB."
+msgid "Upper bound of the window at this direction's receiver: server for upload, client for download. The working window follows each connection's use, up to the fair share of the receiver's memory. Empty is 512 MiB."
 msgstr ""
 
 #: htdocs/luci-static/resources/view/homeproxy/node.js
@@ -4261,7 +4269,7 @@ msgid "Bytes retained at the sender until cumulative Data ACK, both paths and un
 msgstr ""
 
 #: htdocs/luci-static/resources/view/homeproxy/multipath.js
-msgid "Receive window: ceiling · live"
+msgid "Receive window: ceiling · fair share"
 msgstr ""
 
 #: htdocs/luci-static/resources/view/homeproxy/multipath.js
@@ -4269,7 +4277,7 @@ msgid "server share"
 msgstr ""
 
 #: htdocs/luci-static/resources/view/homeproxy/multipath.js
-msgid "Window at the receiver: server for upload, client for download. The live window is each active session's fair share of the receiver's memory."
+msgid "Window at the receiver: server for upload, client for download. The fair share is the level at which the receiver's memory is divided by demand (max-min): a connection whose window limits its sender may grow up to it, while the others keep what they use. It is not the window of any one connection."
 msgstr ""
 
 #: htdocs/luci-static/resources/view/homeproxy/multipath.js

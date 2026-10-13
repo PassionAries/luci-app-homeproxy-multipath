@@ -16,6 +16,12 @@ const callMultipathStatus = rpc.declare({
 	expect: { '': {} }
 });
 
+const callSingBoxFeatures = rpc.declare({
+	object: 'luci.homeproxy',
+	method: 'singbox_get_features',
+	expect: { '': {} }
+});
+
 const sectionState = new Map();
 const dismissedEventPrefix = 'homeproxy.multipath.dismissed-event.';
 
@@ -798,8 +804,8 @@ function renderDirectionPolicy(node, direction, remote, stale) {
 				_('Data waiting to be assigned to a path. The live limit follows the delivery rate of the carrying paths (about 10 ms of data, at least 1 MiB) and is the largest among open connections.') ],
 			[ _('Send history: ceiling · live'), '%s · %s'.format(ceiling(p.send_buffer_bytes, upload ? p.effective_send_buffer_bytes : null), live(sender.history_limit_bytes)),
 				_('Bytes retained at the sender until cumulative Data ACK, both paths and unsent data included. The live limit is about twice the bandwidth-delay product within the sender\'s fair memory share, largest among open connections.') ],
-			[ _('Receive window: ceiling · live'), '%s · %s'.format(ceiling(p.receive_window_bytes, upload ? null : p.effective_receive_window_bytes), upload ? _('server share') : formatBytes(node.memory?.receive_share_bytes)),
-				_('Window at the receiver: server for upload, client for download. The live window is each active session\'s fair share of the receiver\'s memory.') ],
+			[ _('Receive window: ceiling · fair share'), '%s · %s'.format(ceiling(p.receive_window_bytes, upload ? null : p.effective_receive_window_bytes), upload ? _('server share') : formatBytes(node.memory?.receive_share_bytes)),
+				_('Window at the receiver: server for upload, client for download. The fair share is the level at which the receiver\'s memory is divided by demand (max-min): a connection whose window limits its sender may grow up to it, while the others keep what they use. It is not the window of any one connection.') ],
 			[ _('Path stall timeout floor'), p.path_stall_timeout_min_ms ? formatDuration(p.path_stall_timeout_min_ms) : _('Adaptive'),
 				_('Optional lower bound on adaptive sender no-progress detection. Applies to either path, not a fixed retransmission or disconnect timer.') ]
 		])
@@ -1066,11 +1072,16 @@ return view.extend({
 	error: null,
 
 	load() {
-		return L.resolveDefault(callMultipathStatus(), { nodes: [] });
+		return Promise.all([
+			L.resolveDefault(callMultipathStatus(), { nodes: [] }),
+			L.resolveDefault(callSingBoxFeatures(), {})
+		]);
 	},
 
-	render(result) {
+	render(data) {
+		const [result, features] = Array.isArray(data) ? data : [data, null];
 		this.result = result;
+		this.features = features;
 		this.root = E('div', { 'class': 'mp-page' });
 		this.renderStatus();
 		poll.add(() => callMultipathStatus().then((next) => {
@@ -1119,6 +1130,10 @@ return view.extend({
 			content.push(E('div', { 'class': 'mp-notice' }, [ _('Failed to read multipath status: %s').format(this.error) ]));
 		else if (stale)
 			content.push(E('div', { 'class': 'mp-notice' }, [ _('Multipath status data is stale.') ]));
+		// The OpenWrt feeds ship sing-box without Multipath; its version
+		// names the fork when the right build is installed.
+		if (typeof this.features?.version === 'string' && !/multipath/.test(this.features.version))
+			content.push(E('div', { 'class': 'mp-notice' }, [ _('The installed sing-box (%s) has no Multipath support. Multipath nodes need the singbox-multipath build of sing-box on this device; the sing-box package from the OpenWrt feeds cannot run them.').format(this.features.version || _('unknown version')) ]));
 		if (this.result?.incompatible_schemas?.length)
 			content.push(E('div', { 'class': 'mp-notice' }, [ _('Unsupported status schema: %s. This page requires singbox-multipath beta10 status schema 5; upgrade sing-box on both endpoints and restart HomeProxy.').format(this.result.incompatible_schemas.join(', ')) ]));
 
